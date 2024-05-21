@@ -8,7 +8,7 @@ const cors = require('cors');
 const multer = require('multer');
 const path = require('path');
 const nodemailer = require('nodemailer');
-//adarsh
+
 const app = express();
 const port = process.env.PORT || 5000;
 
@@ -162,7 +162,18 @@ app.post('/login', (req, res) => {
             const user = results[0];
             const match = await bcrypt.compare(password, user.password);
             if (match) {
-                const token = jwt.sign({ id: user.id, email: user.email, user_type: user.user_type }, process.env.JWT_SECRET, { expiresIn: '1h' });
+                const token = jwt.sign(
+                    {
+                        id: user.id,
+                        email: user.email,
+                        first_name: user.first_name,
+                        last_name: user.last_name,
+                        phone_number: user.phone_number,
+                        user_type: user.user_type
+                    },
+                    process.env.JWT_SECRET,
+                    { expiresIn: '1h' }
+                );
                 return res.status(200).json({ token, userType: user.user_type });
             } else {
                 return res.sendStatus(401); 
@@ -172,6 +183,7 @@ app.post('/login', (req, res) => {
         }
     });
 });
+
 
 app.get('/seller/:id', authenticateToken, (req, res) => {
     const sellerId = req.params.id;
